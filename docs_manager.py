@@ -38,7 +38,6 @@ class DocsManager:
 
     def insert_data_in_doc(self, doc, tasks_per_developer):
         row_developer = ROW + 1
-        #doc.update("C5:Q15", "=HIPERLINK(%s)" , )
         for devs, tasks in tasks_per_developer.items(): 
             col = COLUMN -1
             doc.format('B%s'% row_developer, {'textFormat': {'bold': True, "fontSize": 11}})
@@ -55,7 +54,10 @@ class DocsManager:
                 estimate = task.estimateTime
                 if  row_task - row_developer > max_tasks_per_day:
                     max_tasks_per_day = row_task - row_developer
-                while estimate > 0:               
+                while estimate > 0:    
+                    if hours_days[9] == 0: # Last day of the sprint has 0 hours remaining
+                        finish = True
+                        break            
                     day_value = doc.cell(ROW, col).value
                     weekday = datetime.strptime(day_value, '%d/%m/%Y').weekday()
                     if weekday == 4: #Saturday
@@ -63,12 +65,7 @@ class DocsManager:
                         col +=1
                         doc.update_cell(row_task, col, "SATURDAY")
                         col +=1
-                    if hours_days[9] == 0: # Last day of the sprint has 0 hours remaining
-                        finish = True
-                        break 
                     doc.update_cell(row_task, col,"=HIPERLINK(\"%s\", \"%s\")" % (task.link, task.key))
-                    #doc.update("C5:Q15", "=HIPERLINK(%s)" , )
-                    #doc.update_cell(row_task, col, task.link)
                     if estimate >= hours_days[current_day]:
                         estimate -= hours_days[current_day]
                         hours_days[current_day] = 0
